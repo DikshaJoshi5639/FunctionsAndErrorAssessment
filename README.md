@@ -21,28 +21,42 @@ To run this program, you can use Remix, an online Solidity IDE. To get started, 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract FunctionsAndError {
-    mapping(uint => uint) public votes;
-    bool public votingClosed;
+contract SupplyChain {
+    address public seller;
+    uint256 public itemPrice;
+    uint256 public totalItemsInStock;
 
-    function Voting(uint candidateId) external {
-        require(candidateId > 0 && candidateId<10 , "Invalid candidate");
-
-        votes[candidateId]++;
+    constructor(uint256 _itemPrice, uint256 _totalItemsInStock) {
+        seller = msg.sender;
+        itemPrice = _itemPrice;
+        totalItemsInStock = _totalItemsInStock;
     }
-    function VotingClosed() external {
-        assert(!votingClosed);
+
+    //REQUIRE() METHOD
+    function buyItem(uint256 quantity) external payable {
+        require(quantity <= totalItemsInStock, "Not enough items in stock");
+
+        totalItemsInStock -= quantity;
+    }
+
+    // ASSERT() METHOD
+    function restockItems(uint256 quantity) external {
+        assert(quantity > 0); 
         
-        votingClosed = true;
+        totalItemsInStock += quantity;
     }
-    function TotalVotes() internal view returns (uint) {
-        uint totalVotes;
-        for (uint i = 1; i <= 10; i++) {
-            totalVotes += votes[i];
+
+    // REVERT() METHOD
+    function setItemPrice(uint256 _itemPrice) external {
+
+        if (_itemPrice == 0) {
+            revert("Item price Can Not be Zero");
         }
-        return totalVotes;
+        
+        itemPrice += _itemPrice;
     }
 }
+
 ```
 4. To compile the code click on the "Solidity Compiler" option on the left hand side. Before compiling check the compiler option is ^0.8.0,then click on the "compile" button.
 5. Once the code is compiled click on the "Deploy and run Transaction" button on the left side of the screen. And click on "Deploy" button.
