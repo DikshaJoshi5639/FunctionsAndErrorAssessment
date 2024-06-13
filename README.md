@@ -4,7 +4,7 @@ This is a sample smart contract that shows how errors are handled in solidity us
 ## Description
 This program is a simple contract written in Solidity, a programming language used for developing smart contracts on the Ethereum blockchain.The contract provides three functions, each demonstrating a different error handling method
 
-1.placeOrder():- This function will help you to order pizza but if their is not sufficient amount in your balance than with the use of require() function and error message will be printed on the screen.
+  1.placeOrder():- This function will help you to order pizza but if their is not sufficient amount in your balance than with the use of require() function and error message will be printed on the screen.
 
 2. delivered():- This function will help you to deliver the pizza to the require address.But if the address is not correct or the order has not been placed by the particular address than using the assert() function the condition will be checked and error message will be printed on the screen.
 
