@@ -3,9 +3,12 @@ This is a sample smart contract that shows how errors are handled in solidity us
 
 ## Description
 This program is a simple contract written in Solidity, a programming language used for developing smart contracts on the Ethereum blockchain.The contract provides three functions, each demonstrating a different error handling method
-1. Voting: Checks if the candidate is valid or invalid according to the candidateId using require() method.And increment the votes after checking.
-2. VotingClosed: Checks if the Voting is been closed or not, if not than it makes the voting closed by assert() function.
-3. TotalVotes: Checks if the voting is already been closed and than count the totalVotes, if not closed and someone tries to count votes than revert() function will print error mesaage "Voting is still open".
+1.placeOrder():- This function will help you to order pizza but if their is not sufficient amount in your balance than with the use of require() function and error 
+                 message will be printed on the screen.
+2. delivered():- This function will help you to deliver the pizza to the require address.But if the address is not correct or the order has not been placed by the 
+                 particular address than using the assert() function the condition will be checked and error message will be printed on the screen.
+3. rejectOrder():- This function will be used to reject the order by the user and if the the conditions are not valid or the user already rejected the order than 
+                   using the revert function error message will be printed on the screen.
 
 ## Getting Started
 
@@ -21,59 +24,64 @@ To run this program, you can use Remix, an online Solidity IDE. To get started, 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract SupplyChain {
-    address public seller;
-    uint256 public itemPrice;
-    uint256 public totalItemsInStock;
+contract pizzaPlacing {
+    uint public CountOrder;
+    mapping(uint => address) public orderOwners;
+    mapping(uint => uint) public orderPizza;
+    mapping(uint => bool) public isDelivered;
+    mapping(uint => bool) public isRejected;
+    
+    event OrderDelivered(uint orderNumber, address client);
+    event OrderRejected(uint orderNumber, address client);
+    
 
-    constructor(uint256 _itemPrice, uint256 _totalItemsInStock) {
-        seller = msg.sender;
-        itemPrice = _itemPrice;
-        totalItemsInStock = _totalItemsInStock;
+    // REQUIRE FUNCTION()
+    function placeOrder(uint SelectPizza) public payable returns(uint) {
+        require(msg.value >= 1, "The Required Payment not met!");
+        CountOrder++;
+        orderOwners[CountOrder] = msg.sender;
+        orderPizza[CountOrder] = SelectPizza;
+        return CountOrder;
+    }
+    
+    // ASSERT FUNCTION()
+    function delivered(uint orderNumber) public {
+    assert(orderOwners[orderNumber] == msg.sender && !isDelivered[orderNumber]);
+    
+    isDelivered[orderNumber] = true;
+    emit OrderDelivered(orderNumber, msg.sender);
     }
 
-    //REQUIRE() METHOD
-    function buyItem(uint256 quantity) external payable {
-        require(quantity <= totalItemsInStock, "Not enough items in stock");
-
-        totalItemsInStock -= quantity;
+    // REVERT FUNCTION()
+    function rejectOrder(uint orderNumber) public {
+    if (orderOwners[orderNumber] != msg.sender || isRejected[orderNumber]) {
+        revert("Order does not exist or has already been rejected");
     }
 
-    // ASSERT() METHOD
-    function restockItems(uint256 quantity) external {
-        assert(quantity > 0); 
-        
-        totalItemsInStock += quantity;
-    }
-
-    // REVERT() METHOD
-    function setItemPrice(uint256 _itemPrice) external {
-
-        if (_itemPrice == 0) {
-            revert("Item price Can Not be Zero");
-        }
-        
-        itemPrice += _itemPrice;
-    }
+    isRejected[orderNumber] = true;
+    emit OrderRejected(orderNumber, msg.sender);
 }
 
+}
 ```
 4. To compile the code click on the "Solidity Compiler" option on the left hand side. Before compiling check the compiler option is ^0.8.0,then click on the "compile" button.
 5. Once the code is compiled click on the "Deploy and run Transaction" button on the left side of the screen. And click on "Deploy" button.
 
 ## Usage
 ### require()
-Parameters():- candidateId > 0 && candidateId<10 , "Invalid candidate" (2 Paramters with condition and a string)
-Returns:- "Invalid candidate"-> If the candidate is not under(0-9) 
-           votes[candidateId]++; -> Will be Added to Total Votes.
+Parameters():- msg.value >= 1, "The Required Payment not met!" (2 Paramters with condition and a string)
+Returns:- "Invalid candidate"-> If the user does not have enough amount in the wallet.
+           CountOrder++;; -> Will be Added to Total Orders.
+           orderOwners[CountOrder] = msg.sender; -> Order will be added to particular address from whom the order has been placed.
+           orderPizza[CountOrder] = SelectPizza; -> Array of mapping that stores the selected pizza for each order. 
 
 ### assert()
-Parameters():- !votingClosed (1 Parmeter which checks if the voting has been closed)
-Returns:- votingClosed = true -> If the Voting was not closed earlier else no change
+Parameters():- orderOwners[orderNumber] == msg.sender && !isDelivered[orderNumber] (1 Parmeter which Ensure order owner and undelivered order.)
+Returns:- isDelivered[orderNumber] = true; -> Makes the condition true for the pizza has been delivered.
 
 ### revert()
-Parameters():- "Voting is still open" (1 Parameter with a string if voting is not closed)
-Returns:- "Voting is still open" -> If someone tries to count the votes before the voting is closed else totalCount of the Votes.
+Parameters():- "Order does not exist or has already been rejected" (1 Parameter with a string)
+Returns:- isRejected[orderNumber] = true; -> If rejected 1st time than it makes the mapping value true;
 
 ## License
 
