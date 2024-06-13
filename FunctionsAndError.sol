@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Mytoken {
+contract pizzaPlacing {
     uint public CountOrder;
     mapping(uint => address) public orderOwners;
     mapping(uint => uint) public orderPizza;
